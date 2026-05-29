@@ -85,6 +85,15 @@ What to check (commands):
 - `ping <host>` → basic latency and packet loss. 
 - `traceroute <host>` or `mtr <host>` → see hops and where latency jumps. 
 - `curl -w "@-" -o /dev/null -s <url>` (with a timing template) → measure response time from the server. 
+# Example curl template cmd:-
+  ```
+ curl -w '\n\
+time_namelookup:  %{time_namelookup}\n\
+time_connect:     %{time_connect}\n\
+time_starttransfer (TTFB): %{time_starttransfer}\n\
+time_total:       %{time_total}\n\n' \
+-o /dev/null -s https://example.com ```
+
 
 What can help fix / mitigate: 
 - If network path bad: escalate to network/ISP team with ping/traceroute outputs. 
