@@ -1,0 +1,55 @@
+#Runbook: Check EC2 Details and Access from Terminal
+
+## Purpose
+This task is about checking important EC2 details directly from the terminal without opening the AWS Management Console. It also confirms whether the logged-in Linux user has admin access or only limited SSH access.[1][2][3]
+
+## Step 1: Check who is logged in
+Run these commands after SSH:
+
+```bash
+whoami
+groups
+```
+
+`whoami` shows the current Linux user. `groups` shows which groups the user belongs to. If groups like `sudo` or `wheel` are missing, the account usually does not have admin rights.[2][3]
+
+## Step 2: Check sudo access
+Run:
+
+```bash
+sudo -l
+```
+
+If the output says the user is not allowed to run sudo, then the account has limited permissions. This means SSH access is available, but system-level changes like installing packages are blocked.[3][4]
+
+## Step 3: Check EC2 metadata
+AWS provides instance details from inside the EC2 through the metadata service at `169.254.169.254`.[1][5]
+
+To see available metadata:
+
+```bash
+curl http://169.254.169.254/latest/meta-data/
+```
+
+Useful commands:
+
+```bash
+curl http://169.254.169.254/latest/meta-data/instance-id
+curl http://169.254.169.254/latest/meta-data/instance-type
+curl http://169.254.169.254/latest/meta-data/ami-id
+curl http://169.254.169.254/latest/meta-data/placement/availability-zone
+```
+
+These commands show the instance ID, instance type, AMI ID, and Availability Zone. The region can be understood from the Availability Zone, for example `ap-south-1a` means region `ap-south-1`.[1][6][7]
+
+## Step 4: Check IAM role
+To see whether an IAM role is attached:
+
+```bash
+curl http://169.254.169.254/latest/meta-data/iam/security-credentials/
+```
+
+If a role name is shown, that means the EC2 has an attached IAM role.[8][9]
+
+## Final understanding
+If the user can SSH into the EC2 but cannot run sudo, install software, or make system changes, then the account is a non-admin Linux user with limited permissions. This is usually intentional and follows least-privilege access.[2][3][10]
